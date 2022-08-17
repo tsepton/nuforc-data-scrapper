@@ -3,10 +3,11 @@ import ReportsError.NotEnoughColumnNames
 sealed private case class Reports(
     columns: List[String],
     fields: List[Report]
-)
+) {
+  def toCSVFormat: String = columns.mkString(",")
+}
 
 object Reports {
-
   def apply(
       columns: List[String],
       fields: List[Report]

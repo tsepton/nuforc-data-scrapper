@@ -40,9 +40,9 @@ object Report {
             city: String,
             state: String,
             country: String,
-            shape: Some[String],
-            duration: Some[String],
-            summary: Some[String],
+            shape: Option[String],
+            duration: Option[String],
+            summary: Option[String],
             posted: String,
             hasImages: Boolean
           ) =>

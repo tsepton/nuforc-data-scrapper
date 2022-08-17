@@ -10,29 +10,35 @@ import net.sourceforge.htmlunit.cyberneko.HTMLElements.ElementList
 @main def main(): Unit = {
   import scala.language.implicitConversions
   given JsoupBrowser()
+  beautifyPrintln("Scrapping...")
   val scrappedData = allLinksToPages.zipWithIndex.map {
     case (page, 0) => downloadDataFromPage(page)
     case _         => Left(ReportsError)
   }.zipWithIndex.map {
     case (Right(data), _) => List(data)
     case (Left(error), i) =>
-      println(f"Error (index $i): $error")
+      //println(f"Error (index $i): $error")
       Nil
   }.filter(_.nonEmpty).flatten
-  // TODO save to CSV file
+  beautifyPrintln("Saving data...")
 }
 
-def allLinksToPages(using browser: JsoupBrowser): List[String] = {
+private def allLinksToPages(using browser: JsoupBrowser): List[String] = {
   val dataByDateDoc = browser.get("https://nuforc.org/webreports/ndxevent.html")
   (dataByDateDoc >> elementList("tbody tr td a") >> attr("href")).map(x => f"https://nuforc.org/webreports/${x}")
 }
 
-def downloadDataFromPage(url: String)(using browser: JsoupBrowser): Either[ReportsError, Reports] = {
+private def downloadDataFromPage(url: String)(using browser: JsoupBrowser): Either[ReportsError, Reports] = {
   val dataFromUrlDoc = browser.get(url)
   val columns: List[JsoupElement] = (dataFromUrlDoc >> elementList("thead tr th font")).map(_.asInstanceOf[JsoupElement])
   val data: List[JsoupElement] = (dataFromUrlDoc >> elementList("tbody tr")).map(_.asInstanceOf[JsoupElement]) // <tr> tds... </tr>
   Reports(columns.map(_.innerHtml), data.map(Report.fromJSoup))
 }
 
-def saveToCSV(): Unit = ???
-
+private def beautifyPrintln(str: String): Unit = println(
+    f"""
+      |${"-" * (str.length*2 +2)}
+      ||${" " * (str.length/2) + str + " " * (str.length/2)}|
+      |${"-" * (str.length*2 +2)}
+    """.stripMargin
+  )
