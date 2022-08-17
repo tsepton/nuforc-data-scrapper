@@ -1,8 +1,35 @@
-## sbt project compiled with Scala 3
+# NUFORC dataset scrapper
 
-### Usage
+The idea for this scrapper comes from the following [repo](https://github.com/planetsig/ufo-reports) holding data from more than 8 years ago. 
 
-This is a normal sbt project. You can compile code with `sbt compile`, run it with `sbt run`, and `sbt console` will start a Scala 3 REPL.
+## Goal
 
-For more information on the sbt-dotty plugin, see the
-[scala3-example-project](https://github.com/scala/scala3-example-project/blob/main/README.md).
+By running the scrapper, you will scrap every data ([sorted per date](https://nuforc.org/webreports/ndxevent.html)) from the [NUFORC website](https://nuforc.org/).
+
+Data scrapped is stored inside `data.csv` file inside the project directory. If you don't want to run the scrapper, you can download the `dataset.csv` file which may be (and surely is) out of date. 
+
+### Data structure
+
+Data inside the CSV file has the same structure has any report page (for instance, this [one](https://nuforc.org/webreports/ndxe202205.html)). That is to say :
+
+| Date / Time | City | State | Country | Shape | Duration | Summary | Posted | Images |
+|-------------| ---- | ----- | ------- | ----- | -------- | ------- | ------ |--------|
+
+## Dependencies
+
+You will need the following requirements
+- Java
+- Scala build tool (sbt)
+
+## Getting started
+
+Open a terminal, clone the repository and run sbt
+```bash
+cd <project folder>
+sbt run
+```
+You should now have a `data.csv` file inside `<project folder>`.
+
+## Missing data
+
+Currently, latitude and longitude of the reports are missing. Old dataset from [this repo](https://github.com/planetsig/ufo-reports) happened to have this data, but it seems NUFORC website has taken down these information.

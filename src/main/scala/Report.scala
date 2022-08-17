@@ -9,14 +9,14 @@ import net.ruippeixotog.scalascraper.model.*
 // Meant to be a single report of the NUFORC website
 // For instance, a line from the following link https://nuforc.org/webreports/ndxp220622.html
 case class Report(
-    date: String, // TODO : DateTime
+    date: String, // Not using datetime because reports do not use standard formats (e.g. : "Several we 22:00")
     city: String,
     state: String,
     country: String,
     shape: Option[String],
     duration: Option[String],
     summary: Option[String],
-    posted: String, // TODO : DateTime
+    posted: String,
     hasImages: Boolean
 ) {
   def toCSVFormat: String = List(
