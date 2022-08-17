@@ -8,8 +8,8 @@ import net.ruippeixotog.scalascraper.model.*
 object Scrapper {
 
   def getReports(using browser: JsoupBrowser): Reports = {
-    val nonConcatenatedRecords = allPages
-      .map(downloadDataFromPage)
+    val nonConcatenatedRecords = allPagesSortedPerDate
+      .map(downloadReportsFromPage)
       .zipWithIndex
       .map {
         case (Right(data), _) => List(data)
@@ -26,14 +26,14 @@ object Scrapper {
     concatenatedRecords
   }
 
-  private def allPages(using browser: JsoupBrowser): List[String] = {
+  private def allPagesSortedPerDate(using browser: JsoupBrowser): List[String] = {
     val dataByDateDoc = browser.get("https://nuforc.org/webreports/ndxevent.html")
     (dataByDateDoc >> elementList("tbody tr td a") >> attr("href")).map(x =>
       f"https://nuforc.org/webreports/${x}"
     )
   }
 
-  private def downloadDataFromPage(
+  private def downloadReportsFromPage(
       url: String
   )(using browser: JsoupBrowser): Either[ReportsError, Reports] = {
     val dataFromUrlDoc = browser.get(url)

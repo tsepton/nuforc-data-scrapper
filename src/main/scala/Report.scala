@@ -6,6 +6,8 @@ import net.ruippeixotog.scalascraper.dsl.DSL.Extract.*
 import net.ruippeixotog.scalascraper.dsl.DSL.Parse.*
 import net.ruippeixotog.scalascraper.model.*
 
+// Meant to be a single report of the NUFORC website
+// For instance, a line from the following link https://nuforc.org/webreports/ndxp220622.html
 case class Report(
     date: String, // TODO : DateTime
     city: String,

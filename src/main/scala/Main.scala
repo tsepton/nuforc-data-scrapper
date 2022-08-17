@@ -1,10 +1,9 @@
 import com.github.nscala_time.time.Imports.*
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
-
 import net.sourceforge.htmlunit.cyberneko.HTMLElements.ElementList
 
-import java.nio.file.{Paths, Files}
 import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
 
 @main def main(): Unit = downloadAndSaveReports()
 

@@ -1,8 +1,10 @@
 import ReportsError.NotEnoughColumnNames
 
+// Meant to be all the reports contained on a single page of the NUFORC website
+// For instance, all lines from https://nuforc.org/webreports/ndxp220622.html
 sealed private case class Reports(
     columns: List[String],
-    fields: List[Report]
+    fields: List[Report] //
 ) {
   def toCSVFormat: String =
     columns.mkString(",") + "\n" + fields.map(_.toCSVFormat).mkString("\n")
