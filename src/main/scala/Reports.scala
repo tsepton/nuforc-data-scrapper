@@ -4,7 +4,9 @@ sealed private case class Reports(
     columns: List[String],
     fields: List[Report]
 ) {
-  def toCSVFormat: String = columns.mkString(",")
+  def toCSVFormat: String =
+    columns.mkString(",") + "\n" + fields.map(_.toCSVFormat).mkString("\n")
+
 }
 
 object Reports {
@@ -17,6 +19,8 @@ object Reports {
     else
       Right(new Reports(columns, fields))
   }
+
+  def getEmpty: Reports = new Reports(Nil, Nil)
 }
 
 sealed trait ReportsError

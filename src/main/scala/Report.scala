@@ -16,7 +16,23 @@ case class Report(
     summary: Option[String],
     posted: String, // TODO : DateTime
     hasImages: Boolean
-)
+) {
+  def toCSVFormat: String = List(
+    date,
+    city,
+    state,
+    country,
+    shape,
+    duration,
+    summary,
+    posted,
+    hasImages
+  ).map {
+    case None      => ""
+    case Some(str) => f""""$str""""
+    case str @ _   => f""""$str""""
+  }.mkString(",")
+}
 
 object Report {
   // Following the structure of a line in https://nuforc.org/webreports/ndxp220622.html

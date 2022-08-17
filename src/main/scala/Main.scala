@@ -7,20 +7,24 @@ import net.ruippeixotog.scalascraper.dsl.DSL.Parse.*
 import net.ruippeixotog.scalascraper.model.*
 import net.sourceforge.htmlunit.cyberneko.HTMLElements.ElementList
 
+import java.nio.file.{Paths, Files}
+import java.nio.charset.StandardCharsets
+
 @main def main(): Unit = {
   import scala.language.implicitConversions
   given JsoupBrowser()
   beautifyPrintln("Scrapping...")
-  val scrappedData = allLinksToPages.zipWithIndex.map {
-    case (page, 0) => downloadDataFromPage(page)
-    case _         => Left(ReportsError)
-  }.zipWithIndex.map {
+  val nonConcatenatedRecords = allLinksToPages.map(downloadDataFromPage).zipWithIndex.map {
     case (Right(data), _) => List(data)
     case (Left(error), i) =>
-      //println(f"Error (index $i): $error")
+      println(f"Error (index $i): $error")
       Nil
   }.filter(_.nonEmpty).flatten
+  val concatenatedRecords = nonConcatenatedRecords.foldLeft(Reports.getEmpty) {
+    (acc, report) => acc.copy(report.columns, acc.fields ++ report.fields)
+  }
   beautifyPrintln("Saving data...")
+  Files.write(Paths.get("./data.csv"), concatenatedRecords.toCSVFormat.getBytes(StandardCharsets.UTF_8))
 }
 
 private def allLinksToPages(using browser: JsoupBrowser): List[String] = {
