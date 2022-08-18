@@ -10,7 +10,7 @@ Data scrapped is stored inside `data.csv` file inside the project directory. If 
 
 ### Data structure
 
-Data inside the CSV file has the same structure has any report page (for instance, this [one](https://nuforc.org/webreports/ndxe202205.html)). That is to say :
+Data inside the CSV file has the same structure as any report webpage (for instance, this [one](https://nuforc.org/webreports/ndxe202205.html)). That is to say :
 
 | Date / Time | City | State | Country | Shape | Duration | Summary | Posted | Images |
 |-------------| ---- | ----- | ------- | ----- | -------- | ------- | ------ |--------|
@@ -30,6 +30,6 @@ sbt run
 ```
 You should now have a `data.csv` file inside `<project folder>`.
 
-## Missing data
+## Future Work
 
-Currently, latitude and longitude of the reports are missing. Old dataset from [this repo](https://github.com/planetsig/ufo-reports) happened to have this data, but it seems NUFORC website has taken down these information.
+Currently, latitude and longitude of the reports are missing. They need to be extrapolated from the city of the report. 
