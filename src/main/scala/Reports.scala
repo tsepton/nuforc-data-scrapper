@@ -4,10 +4,19 @@ import ReportsError.NotEnoughColumnNames
 // For instance, all lines from https://nuforc.org/webreports/ndxp220622.html
 sealed private case class Reports(
     columns: List[String],
-    fields: List[Report] //
+    fields: List[Report]
 ) {
+
   def toCSVFormat: String =
     columns.mkString(",") + "\n" + fields.map(_.toCSVFormat).mkString("\n")
+
+  def length: Int = fields.length
+
+  def map(f: Report => Any): List[Any] = fields.map(f)
+
+  def flatMap(f: Report => List[Report]): Reports = new Reports(columns, fields.flatMap(f))
+
+  def filter(f: Report => Boolean): Reports = new Reports(columns, fields.filter(f))
 
 }
 

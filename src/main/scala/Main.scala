@@ -4,6 +4,9 @@ import net.sourceforge.htmlunit.cyberneko.HTMLElements.ElementList
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
+import scala.concurrent.Future
+import concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 @main def main(): Unit = downloadAndSaveReports()
 
@@ -11,15 +14,25 @@ private def downloadAndSaveReports(): Unit = {
   import scala.language.implicitConversions
   given JsoupBrowser()
 
-  // Scrapping data
   beautifyPrintln("Scrapping...")
   val reports = Scrapper.getReports
-  println("done.")
+  println(f"Scrapped ${reports.length} reports")
 
-  // Saving data
-  beautifyPrintln("Saving data...")
-  Files.write(Paths.get("./data.csv"), reports.toCSVFormat.getBytes(StandardCharsets.UTF_8))
-  println("done.")
+  for {
+    report <- reports
+
+    _ = beautifyPrintln("Saving and cleaning...")
+    saving = saveStringToDisk(reports.toCSVFormat)
+    _ = saving.onComplete {
+      case Failure(exception) => println(f"Exception happened while saving raw data : $exception")
+      case Success(_)         => println("Raw data saved")
+    }
+    _ = ??? // TODO cleaning
+  } yield ()
+}
+
+private def saveStringToDisk(str: String): Future[Unit] = Future {
+  Files.write(Paths.get("./raw_data.csv"), str.getBytes(StandardCharsets.UTF_8))
 }
 
 private def beautifyPrintln(str: String): Unit = println(
