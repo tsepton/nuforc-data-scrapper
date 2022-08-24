@@ -7,7 +7,7 @@ import net.ruippeixotog.scalascraper.model.*
 
 object Scrapper {
 
-  def getReports(using browser: JsoupBrowser): Reports = {
+  def getReports(using browser: JsoupBrowser): Table = {
     val nonConcatenatedRecords = allPagesSortedPerDate
       .map(downloadReportsFromPage)
       .zipWithIndex
@@ -19,8 +19,8 @@ object Scrapper {
       }
       .filter(_.nonEmpty)
       .flatten
-    val concatenatedRecords: Reports =
-      nonConcatenatedRecords.foldLeft(Reports.getEmpty) { (acc, report) =>
+    val concatenatedRecords: Table =
+      nonConcatenatedRecords.foldLeft(Table.getEmpty) { (acc, report) =>
         acc.copy(report.columns, acc.fields ++ report.fields)
       }
     concatenatedRecords
@@ -35,12 +35,12 @@ object Scrapper {
 
   private def downloadReportsFromPage(
       url: String
-  )(using browser: JsoupBrowser): Either[ReportsError, Reports] = {
+  )(using browser: JsoupBrowser): Either[TableError, Table] = {
     val dataFromUrlDoc = browser.get(url)
     val columns: List[JsoupElement] =
       (dataFromUrlDoc >> elementList("thead tr th font")).map(_.asInstanceOf[JsoupElement])
     val data: List[JsoupElement] =
       (dataFromUrlDoc >> elementList("tbody tr")).map(_.asInstanceOf[JsoupElement])
-    Reports(columns.map(_.innerHtml), data.map(Report.fromJSoup))
+    Table(columns.map(_.innerHtml), data.map(Report.fromJSoup))
   }
 }

@@ -19,6 +19,7 @@ case class Report(
     posted: String,
     hasImages: Boolean
 ) {
+
   def toCSVFormat: String = List(
     date,
     city,

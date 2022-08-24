@@ -1,8 +1,8 @@
-import ReportsError.NotEnoughColumnNames
+import TableError.NotEnoughColumnNames
 
 // Meant to be all the reports contained on a single page of the NUFORC website
 // For instance, all lines from https://nuforc.org/webreports/ndxp220622.html
-sealed private case class Reports(
+sealed private case class Table(
     columns: List[String],
     fields: List[Report]
 ) {
@@ -12,30 +12,31 @@ sealed private case class Reports(
 
   def length: Int = fields.length
 
-  def map(f: Report => Any): List[Any] = fields.map(f)
+  def map(f: Report => Report): Table = this.copy(fields = fields.map(f))
 
-  def flatMap(f: Report => List[Report]): Reports = new Reports(columns, fields.flatMap(f))
+  def flatMap(f: Report => List[Report]): Table = new Table(columns, fields.flatMap(f))
 
-  def filter(f: Report => Boolean): Reports = new Reports(columns, fields.filter(f))
+  def filter(f: Report => Boolean): Table = new Table(columns, fields.filter(f))
 
 }
 
-object Reports {
+object Table {
   def apply(
       columns: List[String],
       fields: List[Report]
-  ): Either[ReportsError, Reports] = {
+  ): Either[TableError, Table] = {
     if (classOf[Report].getDeclaredFields.length != columns.length)
       Left(NotEnoughColumnNames)
     else
-      Right(new Reports(columns, fields))
+      Right(new Table(columns, fields))
   }
 
-  def getEmpty: Reports = new Reports(Nil, Nil)
+  def getEmpty: Table = new Table(Nil, Nil)
 }
 
-sealed trait ReportsError
+sealed trait TableError
 
-case object ReportsError {
-  case object NotEnoughColumnNames extends ReportsError
+case object TableError {
+  // Nuforc website has probably changed and Report case class doesn't reflect the new data structure
+  case object NotEnoughColumnNames extends TableError
 }
