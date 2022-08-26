@@ -20,20 +20,25 @@ object Standardiser {
       .mkString(" ")
   }
 
-  private def normalisedCityName(report: Report): Report = report.copy(city =
-    normalisedParticle(removedParenthesis(report.city)).replaceAll(" +", " ").trim
-  )
+  private def normalisedCityName(city: String): String =
+    normalisedParticle(removedParenthesis(city)).replaceAll(" +", " ").trim
 
-  private def normaliseState(report: Report): Report = ???
+  private def normaliseState(state: String): String = ???
 
-  private def normaliseCountry(report: Report): Report = ???
+  private def normaliseCountry(country: String): String = ???
 
-  private def normaliseShape(report: Report): Report = ???
+  private def normaliseShape(shape: String): String = ???
 
   def apply(reports: Table): Future[Table] = {
     import concurrent.ExecutionContext.Implicits.global
 
-    Future { reports.map(normalisedCityName) }
+    Future {
+      reports.map(report =>
+        report.copy(
+          city = normalisedCityName(report.city)
+        )
+      )
+    }
   }
 
 }
