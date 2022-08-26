@@ -33,14 +33,16 @@ object Standardiser {
 
   def apply(reports: Table[Report]): Future[Table[Report]] = {
     import concurrent.ExecutionContext.Implicits.global
-
+    // FIXME : I don't understand the compiler error on this (when removing .asInstanceOf[_])
     Future {
-      reports.map(report =>
-        report
-          .copy(
-            city = normalisedCityName(report.city)
-          )
-      )
+      reports
+        .map(report =>
+          report
+            .copy(
+              city = normalisedCityName(report.city)
+            )
+        )
+        .asInstanceOf[Table[Report]]
     }
   }
 
