@@ -1,3 +1,5 @@
+import ReportRepresentation.Table
+
 import scala.concurrent.Future
 
 object Standardiser {

@@ -1,8 +1,9 @@
+import ReportRepresentation.Table
 import com.github.nscala_time.time.Imports.*
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.sourceforge.htmlunit.cyberneko.HTMLElements.ElementList
-import scala.concurrent.duration.Duration
 
+import scala.concurrent.duration.Duration
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import scala.concurrent.{Await, Future}
@@ -26,7 +27,9 @@ private def downloadAndSaveReports(): Unit = {
     case Success(_)         => println("Raw data saved inside ./raw.csv")
   }
   val savingEnhancedF =
-    Standardiser(reports).map(standardized => saveTable(standardized, "./enhanced.csv"))
+    Standardiser(reports)
+      // .map(standardized => DataEnhancer)
+      .map(standardized => saveTable(standardized, "./enhanced.csv"))
   savingEnhancedF.onComplete {
     case Failure(exception) => println(f"Could not save enhanced data: $exception")
     case Success(_)         => println("Enhanced data saved inside ./enhanced_data.csv")

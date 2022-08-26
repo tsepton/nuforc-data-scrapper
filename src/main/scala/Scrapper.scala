@@ -1,3 +1,4 @@
+import ReportRepresentation.{Report, Table, TableError}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser.JsoupElement
 import net.ruippeixotog.scalascraper.dsl.DSL.*

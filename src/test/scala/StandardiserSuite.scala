@@ -1,3 +1,5 @@
+import ReportRepresentation.{Report, Table}
+
 import concurrent.ExecutionContext.Implicits.global
 
 class StandardiserSuite extends munit.FunSuite {
