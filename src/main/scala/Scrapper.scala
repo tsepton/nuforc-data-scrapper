@@ -9,9 +9,8 @@ import net.ruippeixotog.scalascraper.model.*
 object Scrapper {
 
   def getReports(using browser: JsoupBrowser): Table[Report] = {
-    val nonConcatenatedRecords = allPagesSortedPerDate.zipWithIndex
-      .filter { case (_, i) => i == 1 }
-      .map(x => downloadReportsFromPage(x._1))
+    val nonConcatenatedRecords = allPagesSortedPerDate
+      .map(downloadReportsFromPage)
       .zipWithIndex
       .map {
         case (Right(data), _) => List(data)
