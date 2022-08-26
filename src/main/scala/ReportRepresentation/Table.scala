@@ -24,6 +24,9 @@ sealed case class Table[A <: Data](
 }
 
 object Table {
+  // FIXME
+  // This makes no sense anymore, the map method let us go from a Report to a ReportEnhanced
+  // without having to modify the columns list
   def apply[A <: Data](
       columns: List[String],
       fields: List[A]
