@@ -33,3 +33,5 @@ metals.sbt
 
 # data scrapped
 data.csv
+raw*.csv
+enhanced*.csv
