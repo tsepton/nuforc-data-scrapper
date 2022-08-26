@@ -8,9 +8,10 @@ import net.ruippeixotog.scalascraper.model.*
 
 object Scrapper {
 
-  def getReports(using browser: JsoupBrowser): Table = {
-    val nonConcatenatedRecords = allPagesSortedPerDate
-      .map(downloadReportsFromPage)
+  def getReports(using browser: JsoupBrowser): Table[Report] = {
+    val nonConcatenatedRecords = allPagesSortedPerDate.zipWithIndex
+      .filter { case (_, i) => i == 1 }
+      .map(x => downloadReportsFromPage(x._1))
       .zipWithIndex
       .map {
         case (Right(data), _) => List(data)
@@ -20,7 +21,7 @@ object Scrapper {
       }
       .filter(_.nonEmpty)
       .flatten
-    val concatenatedRecords: Table =
+    val concatenatedRecords: Table[Report] =
       nonConcatenatedRecords.foldLeft(Table.getEmpty) { (acc, report) =>
         acc.copy(report.columns, acc.fields ++ report.fields)
       }
@@ -36,7 +37,7 @@ object Scrapper {
 
   private def downloadReportsFromPage(
       url: String
-  )(using browser: JsoupBrowser): Either[TableError, Table] = {
+  )(using browser: JsoupBrowser): Either[TableError, Table[Report]] = {
     val dataFromUrlDoc = browser.get(url)
     val columns: List[JsoupElement] =
       (dataFromUrlDoc >> elementList("thead tr th font")).map(_.asInstanceOf[JsoupElement])

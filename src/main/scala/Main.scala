@@ -1,4 +1,4 @@
-import ReportRepresentation.Table
+import ReportRepresentation.{Report, ReportEnhanced, Table, Data}
 import com.github.nscala_time.time.Imports.*
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.sourceforge.htmlunit.cyberneko.HTMLElements.ElementList
@@ -28,17 +28,16 @@ private def downloadAndSaveReports(): Unit = {
   }
   val savingEnhancedF =
     Standardiser(reports)
-      // .map(standardized => DataEnhancer)
+      .map(_.map(rep => ReportEnhanced.fromReport(rep)))
       .map(standardized => saveTable(standardized, "./enhanced.csv"))
   savingEnhancedF.onComplete {
     case Failure(exception) => println(f"Could not save enhanced data: $exception")
     case Success(_)         => println("Enhanced data saved inside ./enhanced_data.csv")
   }
   Await.result(savingRawF zip savingEnhancedF, Duration.Inf)
-
 }
 
-private def saveTable(reports: Table, filename: String): Future[Unit] = Future {
+private def saveTable[A <: Data](reports: Table[A], filename: String): Future[Unit] = Future {
   Files.write(Paths.get(filename), reports.toCSVFormat.getBytes(StandardCharsets.UTF_8))
 }
 

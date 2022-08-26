@@ -30,7 +30,7 @@ class StandardiserSuite extends munit.FunSuite {
 
 object DataMockup {
 
-  def emptyReports: Table = Table(
+  def emptyReports: Table[Report] = Table(
     columns = List(
       "date",
       "city",

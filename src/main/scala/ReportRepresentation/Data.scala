@@ -11,6 +11,7 @@ import net.ruippeixotog.scalascraper.browser.JsoupBrowser.JsoupElement
 import net.ruippeixotog.scalascraper.scraper.ContentExtractors.text
 
 import scala.io.Source
+import scala.util.Try
 
 sealed trait Data {
   def date: String // Not using datetime because reports do not use standard formats (e.g. : "Several we 22:00")
@@ -22,21 +23,6 @@ sealed trait Data {
   def summary: Option[String]
   def posted: String
   def hasImages: Boolean
-}
-
-// Meant to be a single report of the NUFORC website
-// For instance, a line from the following link https://nuforc.org/webreports/ndxp220622.html
-case class Report(
-    date: String, // Not using datetime because reports do not use standard formats (e.g. : "Several we 22:00")
-    city: String,
-    state: String,
-    country: String,
-    shape: Option[String],
-    duration: Option[String],
-    summary: Option[String],
-    posted: String,
-    hasImages: Boolean
-) extends Data {
 
   def toCSVFormat: String = List(
     date,
@@ -54,6 +40,20 @@ case class Report(
     case str @ _   => f""""$str""""
   }.mkString(",")
 }
+
+// Meant to be a single report of the NUFORC website
+// For instance, a line from the following link https://nuforc.org/webreports/ndxp220622.html
+case class Report(
+    date: String, // Not using datetime because reports do not use standard formats (e.g. : "Several we 22:00")
+    city: String,
+    state: String,
+    country: String,
+    shape: Option[String],
+    duration: Option[String],
+    summary: Option[String],
+    posted: String,
+    hasImages: Boolean
+) extends Data
 
 object Report {
   // Following the structure of a line in https://nuforc.org/webreports/ndxp220622.html
@@ -108,8 +108,8 @@ case class ReportEnhanced(
     summary: Option[String],
     posted: String,
     hasImages: Boolean,
-    latitude: String,
-    longitude: String
+    latitude: Option[String],
+    longitude: Option[String]
 ) extends Data
 
 object ReportEnhanced {
@@ -127,11 +127,33 @@ object ReportEnhanced {
 
   lazy private val content = {
     header
-    file.map(header.zip(_).toMap)
+    val iterator = file.map(header.zip(_).toMap)
+    (for {
+      line <- iterator
+      key = f"""${line("country")}-${line("state")}-${"city"}"""
+    } yield (key -> line)).toMap
   }
 
-  def test: Unit = println(content)
+  private def getData(report: Report) = content(
+    f"""${report.country}-${report.state}-${report.city}"""
+  )
 
-  def addLocation(report: Report): ReportEnhanced = ???
+  def fromReport(report: Report): ReportEnhanced = {
+    val latitude = Try(getData(report)("latitude"))
+    val longitude = Try(getData(report)("longitude"))
+    ReportEnhanced(
+      date = report.date,
+      city = report.city,
+      state = report.state,
+      country = report.country,
+      shape = report.shape,
+      duration = report.duration,
+      summary = report.summary,
+      posted = report.posted,
+      hasImages = report.hasImages,
+      latitude = latitude.toOption,
+      longitude = longitude.toOption
+    )
+  }
 
 }

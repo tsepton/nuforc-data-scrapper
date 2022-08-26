@@ -1,4 +1,4 @@
-import ReportRepresentation.Table
+import ReportRepresentation.{Report, Table}
 
 import scala.concurrent.Future
 
@@ -31,14 +31,15 @@ object Standardiser {
 
   private def normaliseShape(shape: String): String = ???
 
-  def apply(reports: Table): Future[Table] = {
+  def apply(reports: Table[Report]): Future[Table[Report]] = {
     import concurrent.ExecutionContext.Implicits.global
 
     Future {
       reports.map(report =>
-        report.copy(
-          city = normalisedCityName(report.city)
-        )
+        report
+          .copy(
+            city = normalisedCityName(report.city)
+          )
       )
     }
   }
