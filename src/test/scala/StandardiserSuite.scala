@@ -26,6 +26,11 @@ class StandardiserSuite extends munit.FunSuite {
       _ = assert(errors.foldRight(true)(_ && _))
     } yield ()
   }
+
+  test("delete me") {
+    val x = Report("01.01.22", "city", "state", "country", None, None, None, "posted", false)
+    println(x.toCSVFormat)
+  }
 }
 
 object DataMockup {
@@ -43,6 +48,6 @@ object DataMockup {
       "hasImages"
     ),
     fields = Nil
-  ).getOrElse(Table.getEmpty)
+  )
 
 }

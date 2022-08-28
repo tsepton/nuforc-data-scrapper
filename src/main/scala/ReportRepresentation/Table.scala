@@ -14,6 +14,8 @@ sealed case class Table[A <: Data](
 
   def length: Int = fields.length
 
+  // TODO : With this signature, one can update the type without specifying the new
+
   def map(f: A => _ <: Data): Table[_ <: Data] = this.copy(fields = fields.map(f))
 
   def flatMap(f: A => List[A]): Table[A] = new Table(columns, fields.flatMap(f))
