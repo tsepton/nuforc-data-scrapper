@@ -1,4 +1,4 @@
-import ReportRepresentation.{Report, Table, TableError}
+import ReportRepresentation.{Report, Table}
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser
 import net.ruippeixotog.scalascraper.browser.JsoupBrowser.JsoupElement
 import net.ruippeixotog.scalascraper.dsl.DSL.*
@@ -36,12 +36,24 @@ object Scrapper {
 
   private def downloadReportsFromPage(
       url: String
-  )(using browser: JsoupBrowser): Either[TableError, Table[Report]] = {
+  )(using browser: JsoupBrowser): Either[ScrappingError, Table[Report]] = {
     val dataFromUrlDoc = browser.get(url)
     val columns: List[JsoupElement] =
       (dataFromUrlDoc >> elementList("thead tr th font")).map(_.asInstanceOf[JsoupElement])
     val data: List[JsoupElement] =
       (dataFromUrlDoc >> elementList("tbody tr")).map(_.asInstanceOf[JsoupElement])
-    Table(columns.map(_.innerHtml), data.map(Report.fromJSoup))
+
+    (columns.map(_.innerHtml), data.map(Report.fromJSoup)) match {
+      case (header, data) if header.length == classOf[Report].getDeclaredFields.length =>
+        Right(Table(header, data))
+      case _ => Left(ScrappingError.NotEnoughColumnNames)
+    }
   }
+}
+
+sealed trait ScrappingError
+
+case object ScrappingError {
+  // Nuforc website has probably changed and ReportRepresentation.Report case class doesn't reflect the new data structure
+  case object NotEnoughColumnNames extends ScrappingError
 }

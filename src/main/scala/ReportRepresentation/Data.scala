@@ -110,7 +110,26 @@ case class ReportEnhanced(
     hasImages: Boolean,
     latitude: Option[String],
     longitude: Option[String]
-) extends Data
+) extends Data {
+  // FIXME
+  override def toCSVFormat: String = List(
+    date,
+    city,
+    state,
+    country,
+    shape,
+    duration,
+    summary,
+    posted,
+    hasImages,
+    latitude,
+    longitude
+  ).map {
+    case None      => ""
+    case Some(str) => f""""$str""""
+    case str @ _   => f""""$str""""
+  }.mkString(",")
+}
 
 object ReportEnhanced {
 
@@ -155,23 +174,5 @@ object ReportEnhanced {
       longitude = longitude.toOption
     )
   }
-
-  def toCSVFormat: String = List(
-    date,
-    city,
-    state,
-    country,
-    shape,
-    duration,
-    summary,
-    posted,
-    hasImages,
-    latitude,
-    longitude
-  ).map {
-    case None      => ""
-    case Some(str) => f""""$str""""
-    case str @ _   => f""""$str""""
-  }.mkString(",")
 
 }

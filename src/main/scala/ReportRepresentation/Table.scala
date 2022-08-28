@@ -1,7 +1,6 @@
 package ReportRepresentation
 
 import ReportRepresentation.Report
-import ReportRepresentation.TableError.NotEnoughColumnNames
 
 // Meant to be all the reports contained on a single page of the NUFORC website
 // For instance, all lines from https://nuforc.org/webreports/ndxp220622.html
@@ -24,24 +23,5 @@ sealed case class Table[A <: Data](
 }
 
 object Table {
-  // FIXME
-  // This makes no sense anymore, the map method let us go from a Report to a ReportEnhanced
-  // without having to modify the columns list
-  def apply[A <: Data](
-      columns: List[String],
-      fields: List[A]
-  ): Either[TableError, Table[A]] = {
-    // FIXME: needs to be repaired since refactor (classOf[Report])
-    if (classOf[Report].getDeclaredFields.length != columns.length) Left(NotEnoughColumnNames)
-    else Right(new Table(columns, fields))
-  }
-
   def getEmpty: Table[Report] = new Table(Nil, Nil)
-}
-
-sealed trait TableError
-
-case object TableError {
-  // Nuforc website has probably changed and ReportRepresentation.Report case class doesn't reflect the new data structure
-  case object NotEnoughColumnNames extends TableError
 }
