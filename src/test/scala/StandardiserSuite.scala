@@ -35,19 +35,6 @@ class StandardiserSuite extends munit.FunSuite {
 
 object DataMockup {
 
-  def emptyReports: Table[Report] = Table(
-    columns = List(
-      "date",
-      "city",
-      "state",
-      "country",
-      "shape",
-      "duration",
-      "summary",
-      "posted",
-      "hasImages"
-    ),
-    fields = Nil
-  )
+  def emptyReports: Table[Report] = Table(Nil)
 
 }
