@@ -11,7 +11,7 @@ import net.ruippeixotog.scalascraper.browser.JsoupBrowser.JsoupElement
 import net.ruippeixotog.scalascraper.scraper.ContentExtractors.text
 
 import scala.io.Source
-import scala.util.Try
+import scala.util.{Success, Try}
 
 sealed trait Data {
   def date: String // Not using datetime because reports do not use standard formats (e.g. : "Several we 22:00")
@@ -149,17 +149,19 @@ object ReportEnhanced {
     val iterator = file.map(header.zip(_).toMap)
     (for {
       line <- iterator
-      key = f"""${line("country")}-${line("state")}-${"city"}"""
+      state = line("state").toLowerCase()
+      city = line("city").toLowerCase()
+      key = f"$state-$city"
     } yield (key -> line)).toMap
   }
 
   private def getData(report: Report) = content(
-    f"""${report.country}-${report.state}-${report.city}"""
+    // TODO
+    f"${report.state.toLowerCase()}-${report.city.toLowerCase()}"
   )
 
   def fromReport(report: Report): ReportEnhanced = {
-    val latitude = Try(getData(report)("latitude"))
-    val longitude = Try(getData(report)("longitude"))
+    val info = Try(getData(report))
     ReportEnhanced(
       date = report.date,
       city = report.city,
@@ -170,8 +172,8 @@ object ReportEnhanced {
       summary = report.summary,
       posted = report.posted,
       hasImages = report.hasImages,
-      latitude = latitude.toOption,
-      longitude = longitude.toOption
+      latitude = info.toOption map (_("latitude")),
+      longitude = info.toOption map (_("longitude"))
     )
   }
 
