@@ -30,6 +30,3 @@ metals.sbt
 .idea
 .idea_modules
 /.worksheet/
-
-# data scrapped
-data.csv
