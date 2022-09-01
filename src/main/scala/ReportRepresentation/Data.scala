@@ -24,18 +24,22 @@ sealed trait Data {
   def posted: String
   def hasImages: Boolean
 
-  def toCSVFormat: String = 
-    classOf[Report].getDeclaredFields.toList
-      .map(x => {
-        x.setAccessible(true)
-        x.get(this)
-      })
-      .map {
-        case None      => ""
-        case Some(str) => f""""$str""""
-        case str @ _   => f""""$str""""
-      }
-      .mkString(",")
+  private def columns: List[String]
+
+  def toCSVFormat: String = columns
+    .map { this.getClass.getDeclaredField }
+    .map(x => {
+      x.setAccessible(true)
+      x.get(this)
+    })
+    .map {
+      case None              => ""
+      case Some(str: String) => f""""${str.replaceAll("\"", "'")}""""
+      case str @ _: String   => f""""${str.replaceAll("\"", "'")}""""
+      case value @ _         => f"$value"
+    }
+    .mkString(",")
+
 }
 
 // Meant to be a single report of the NUFORC website
@@ -50,7 +54,9 @@ case class Report(
     summary: Option[String],
     posted: String,
     hasImages: Boolean
-) extends Data
+) extends Data {
+  private def columns: List[String] = Report.columns
+}
 
 object Report {
   // Following the structure of a line in https://nuforc.org/webreports/ndxp220622.html
@@ -93,6 +99,20 @@ object Report {
         )
     }
   }
+
+  // Must match the same order has the case class fields definition
+  // This is a solution to the problem induced by _.getClass.getDeclaredFields which is unordered
+  def columns: List[String] = List(
+    "date",
+    "city",
+    "state",
+    "country",
+    "shape",
+    "duration",
+    "summary",
+    "posted",
+    "hasImages"
+  )
 }
 
 case class ReportEnhanced(
@@ -107,7 +127,9 @@ case class ReportEnhanced(
     hasImages: Boolean,
     latitude: Option[String],
     longitude: Option[String]
-) extends Data
+) extends Data {
+  private def columns: List[String] = ReportEnhanced.columns
+}
 
 object ReportEnhanced {
 
@@ -152,5 +174,8 @@ object ReportEnhanced {
       longitude = longitude.toOption
     )
   }
+
+  // Must match the same order has the case class fields definition
+  def columns: List[String] = Report.columns ::: List("latitude", "longitude")
 
 }

@@ -10,20 +10,14 @@ sealed case class Table[A <: Data](
     fields: List[A]
 ) {
 
-  def columns: List[String] = {
-    // FIXME :
-    // 1. We cannot get the header if the table is empty...
-    //    objectOf[A] not working,  match { case _: List[Report] ... } cannot be checked at runtime...
-    // 2. Also there is no guarantee the fields will be ordered as their declaration is
-    fields.headOption.map(_.getClass.getDeclaredFields.toList.map(_.getName)).getOrElse(Nil)
-  }
+  def columns: List[String] = if (List[Data] == List[A]) Report.columns else ReportEnhanced.columns
 
   def toCSVFormat: String =
     columns.mkString(",") + "\n" + fields.map(_.toCSVFormat).mkString("\n")
 
   def length: Int = fields.length
 
-  def map(f: A => _ <: Data): Table[_ <: Data] = this.copy(fields = fields.map(f))
+  def map[B <: Data](f: A => B): Table[B] = this.copy(fields = fields.map(f))
 
   def flatMap(f: A => List[A]): Table[A] = new Table(fields.flatMap(f))
 
