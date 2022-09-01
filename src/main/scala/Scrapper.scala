@@ -9,17 +9,13 @@ import net.ruippeixotog.scalascraper.model.*
 object Scrapper {
 
   def getReports(using browser: JsoupBrowser): Table[Report] = {
-    val nonConcatenatedRecords = allPagesSortedPerDate.zipWithIndex
-      .map {
-        case (x, i) => {
-          if (i == 0) downloadReportsFromPage(x) else Left(ScrappingError.NotEnoughColumnNames)
-        }
-      }
+    val nonConcatenatedRecords = allPagesSortedPerDate
+      .map(downloadReportsFromPage)
       .zipWithIndex
       .map {
         case (Right(data), _) => List(data)
         case (Left(error), i) =>
-          // println(f"Error (index $i): $error")
+          println(f"Error (index $i): $error")
           Nil
       }
       .filter(_.nonEmpty)
@@ -50,7 +46,7 @@ object Scrapper {
     (columns.map(_.innerHtml), data.map(Report.fromJSoup)) match {
       case (header, data) if header.length == classOf[Report].getDeclaredFields.length =>
         Right(Table(data))
-      case _ => Left(ScrappingError.NotEnoughColumnNames)
+      case _ => Left(ScrappingError.WebsiteStructureHasChanged)
     }
   }
 }
@@ -59,5 +55,5 @@ sealed trait ScrappingError
 
 case object ScrappingError {
   // Nuforc website has probably changed and ReportRepresentation.Report case class doesn't reflect the new data structure
-  case object NotEnoughColumnNames extends ScrappingError
+  case object WebsiteStructureHasChanged extends ScrappingError
 }
