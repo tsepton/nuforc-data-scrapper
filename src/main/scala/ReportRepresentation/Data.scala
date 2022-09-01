@@ -24,7 +24,7 @@ sealed trait Data {
   def posted: String
   def hasImages: Boolean
 
-  private def columns: List[String]
+  def columns: List[String]
 
   def toCSVFormat: String = columns
     .map { this.getClass.getDeclaredField }
@@ -55,7 +55,7 @@ case class Report(
     posted: String,
     hasImages: Boolean
 ) extends Data {
-  private def columns: List[String] = Report.columns
+  def columns: List[String] = Report.columns
 }
 
 object Report {
@@ -128,7 +128,7 @@ case class ReportEnhanced(
     latitude: Option[String],
     longitude: Option[String]
 ) extends Data {
-  private def columns: List[String] = ReportEnhanced.columns
+  def columns: List[String] = ReportEnhanced.columns
 }
 
 object ReportEnhanced {
