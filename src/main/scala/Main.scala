@@ -21,18 +21,18 @@ private def downloadAndSaveReports(): Unit = {
   println(f"scrapped ${reports.length} reports")
 
   beautifyPrintln("Saving and cleaning...")
-  val savingRawF = saveTable(reports, "./raw_data.csv")
+  val savingRawF = saveTable(reports, "./data/raw_data.csv")
   savingRawF.onComplete {
     case Failure(exception) => println(f"Could not save raw data: $exception")
-    case Success(_)         => println("Raw data saved inside ./raw.csv")
+    case Success(_)         => println("Raw data saved inside ./data/raw.csv")
   }
   val savingEnhancedF =
     Standardiser(reports)
       .map(_.map(rep => ReportEnhanced.fromReport(rep)))
-      .map(standardized => saveTable(standardized, "./enhanced.csv"))
+      .map(standardized => saveTable(standardized, "./data/enhanced.csv"))
   savingEnhancedF.onComplete {
     case Failure(exception) => println(f"Could not save enhanced data: $exception")
-    case Success(_)         => println("Enhanced data saved inside ./enhanced_data.csv")
+    case Success(_)         => println("Enhanced data saved inside ./data/enhanced_data.csv")
   }
   Await.result(savingRawF zip savingEnhancedF, Duration.Inf)
 }
